@@ -11,11 +11,20 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+
+import java.util.HashMap;
+
+import pl.eiti.cociekawego.utils.Helper;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
 
+    TextView text;
+    Toolbar toolbar;
+    NavigationView navigationView;
+    HashMap<String, Object> navDrawerElements;
 
 
     @Override
@@ -23,24 +32,49 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        navDrawerElements = new HashMap<>();
+        mapElements();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        text = (TextView) findViewById(R.id.my_text);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        SharedPreferences settings = getSharedPreferences("UserPreferences", 0);
+        String tmp = settings.getString("Rozrywka", null);
+        if (tmp == null){
+            //application has never been run, so SharedPreferences are empty
+            //in any other situation user preferences will be avaliable
+
+        }else{
+            Log.i("CoCiekawego MainActivity", "Other run");
+        }
+
     }
+
+
 
     @Override
     protected void onResume(){
         super.onResume();
+        String[] pref = Helper.getPreferencesArray(this);
+        StringBuilder builder = new StringBuilder();
         SharedPreferences settings = getSharedPreferences("UserPreferences", 0);
-        String str = settings.getString("Rozrywka", "").toString();
-        Log.i("CoCiekawego", str);
-
-
+        for (int i = 0;i<pref.length;i++){
+            String value = settings.getString(pref[i], "null");
+            if (value.equals("true")){
+                navigationView.getMenu().findItem((Integer)navDrawerElements.get(pref[i])).setVisible(true);
+            }else{
+                navigationView.getMenu().findItem((Integer)navDrawerElements.get(pref[i])).setVisible(false);
+            }
+            builder.append(pref[i] + " : " + value + "\r\n");
+        }
+        text.setText(builder.toString());
     }
+
 
     @Override
     public void onBackPressed() {
@@ -74,7 +108,7 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
+
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -100,5 +134,14 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void mapElements() {
+        //it's not elegant but we are lazy students
+        navDrawerElements.put("Transport publiczny", R.id.nav_public_transport);
+        navDrawerElements.put("Parking P+R", R.id.nav_parking);
+        navDrawerElements.put("Obiekty sportowe", R.id.nav_sport_facilities);
+        navDrawerElements.put("Stacje Veturilo", R.id.nav_veturilo);
+        navDrawerElements.put("Rozrywka", R.id.nav_entertainment);
     }
 }

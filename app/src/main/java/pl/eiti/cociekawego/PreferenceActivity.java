@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import pl.eiti.cociekawego.utils.Helper;
+
 /**
  * Created by krystian on 2016-05-04.
  */
@@ -36,13 +38,8 @@ public class PreferenceActivity extends Activity {
         toolbar.setTitle(R.string.preferences);
 
         listView = (ListView) findViewById(R.id.preference_listview);
+        values = Helper.getPreferencesArray(this);
 
-        TypedArray preferences_list = getResources().obtainTypedArray(R.array.preferencje);
-
-        values = new String[preferences_list.length()];
-        for (int i=0;i<preferences_list.length();i++){
-            values[i] = preferences_list.getString(i);
-        }
 
         final ArrayList<String> list = new ArrayList<String>();
         for (int i = 0; i< values.length; i++){
@@ -51,24 +48,40 @@ public class PreferenceActivity extends Activity {
 
         final StableArrayAdapter  adapter = new StableArrayAdapter(this, android.R.layout.simple_list_item_multiple_choice, list);
         listView.setAdapter(adapter);
+
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+    }
+
+    protected void onResume (){
+
+        super.onResume();
+        SharedPreferences settings = getSharedPreferences("UserPreferences", MODE_PRIVATE);
+        for (int i = 0; i<values.length;i++){
+            String val = settings.getString(values[i], "null");
+            if (val.equals("true")){
+                listView.setItemChecked(i, true);
+            }
+        }
 
 
     }
 
+
     protected void onPause (){
         super.onPause();
-        Log.i("CoCiekawego", "onPause Preference Activity");
-        long[] positons = listView.getCheckedItemIds();
-
-        Log.i("CoCiekawego", "Pozycja 1: " + positons[0]);
-        SharedPreferences settings = getSharedPreferences("UserPreferences", 0);
+        //go throught all values array to check which elements has been checked by user and save
+        // this choice do SharedPreferences
+        SharedPreferences settings = getSharedPreferences("UserPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
-        editor.clear(); //clear all preferences and add all new
-        for (int i =0; i< positons.length; i++){
-            int pos = (int) positons[i];
-
-            editor.putString(values[pos], "true");
+        //clear all previous choices
+        editor.clear();
+        for (int i=0; i< values.length; i++){
+            if(listView.isItemChecked(i)){
+                editor.putString(values[i], "true");
+            }else{
+                editor.putString(values[i], "false");
+            }
         }
         editor.commit();
 
@@ -94,6 +107,7 @@ public class PreferenceActivity extends Activity {
         public boolean hasStableIds(){
             return true;
         }
+
 
     }
 }
