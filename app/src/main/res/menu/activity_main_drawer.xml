@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_public_transport"
+            android:icon="@drawable/ic_menu_public_transport"
+            android:title="@string/public_transport" />
+        <item
+            android:id="@+id/nav_parking"
+            android:icon="@drawable/ic_menu_parking"
+            android:title="@string/parking" />
+        <item
+            android:id="@+id/nav_sport_facilities"
+            android:icon="@drawable/ic_menu_sport_facilities"
+            android:title="@string/sport_facilities" />
+        <item
+            android:id="@+id/nav_veturilo"
+            android:icon="@drawable/ic_menu_veturilo"
+            android:title="@string/veturilo" />
+        <item
+            android:id="@+id/nav_entertainment"
+            android:icon="@drawable/ic_menu_entertainment"
+            android:title="@string/entertainment" />
+    </group>
+
+    <item android:title="@string/account">
+        <menu>
+            <item
+                android:id="@+id/nav_preferences"
+                android:icon="@drawable/ic_menu_preferences"
+                android:title="@string/preferences" />
+        </menu>
+    </item>
+
+</menu>

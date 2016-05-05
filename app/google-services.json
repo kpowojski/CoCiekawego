@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "746296337270",
+    "project_id": "cociekawego-1301"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746296337270:android:27d689d63f1b7a06",
+        "android_client_info": {
+          "package_name": "com.google.samples.quickstart.signin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "746296337270-447igsddlfmr0dsbs6q12f7up10sdbbo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.google.samples.quickstart.signin",
+            "certificate_hash": "C0FBFC262FFE70A9FDF15B5872CE02598ACCF94C"
+          }
+        },
+        {
+          "client_id": "746296337270-22ggvsrv1nbjg1fg0gl608ao6rmu7k6j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzbPC0whB-vUSq_ECeeUPPlNLhvDhHSmk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">CoCiekawego</string>
+    <string name="google_app_id">1301</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Ustawienia</string>
+
+
+    ///app bar categories
+    <string name="public_transport">Transport publiczny</string>
+    <string name="parking">Parking P+R</string>
+    <string name="sport_facilities">Obiekty sportowe</string>
+    <string name="veturilo">Stacje Veturilo</string>
+    <string name="entertainment">Rozrywka</string>
+    <string name="preferences">Preferencje</string>
+    <string name="account">Moje konto</string>
+</resources>
