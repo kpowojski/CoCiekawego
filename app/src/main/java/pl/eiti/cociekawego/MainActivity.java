@@ -1,5 +1,7 @@
 package pl.eiti.cociekawego;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,14 +13,21 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.HashMap;
+import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
+
+import pl.eiti.cociekawego.callers.AsyncResponse;
+import pl.eiti.cociekawego.callers.CallApi;
 import pl.eiti.cociekawego.utils.Helper;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, AsyncResponse {
 
 
     TextView text;
@@ -26,6 +35,9 @@ public class MainActivity extends AppCompatActivity
     NavigationView navigationView;
     HashMap<String, Object> navDrawerElements;
 
+
+    //for test
+    Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +54,24 @@ public class MainActivity extends AppCompatActivity
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        final Context context = this;
+        final CallApi callApi = new CallApi(context);
+        callApi.delegate = this;
+
+        button = (Button) findViewById(R.id.my_button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+
+                    callApi.execute();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
 
         SharedPreferences settings = getSharedPreferences("UserPreferences", 0);
         String tmp = settings.getString("Rozrywka", null);
@@ -143,5 +173,10 @@ public class MainActivity extends AppCompatActivity
         navDrawerElements.put("Obiekty sportowe", R.id.nav_sport_facilities);
         navDrawerElements.put("Stacje Veturilo", R.id.nav_veturilo);
         navDrawerElements.put("Rozrywka", R.id.nav_entertainment);
+    }
+
+    public JSONObject processFinish(JSONObject result){
+
+        return result;
     }
 }
