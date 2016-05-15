@@ -146,6 +146,7 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_public_transport) {
             Intent intent = new Intent(this, MapsActivity.class);
+            intent.putExtra("url", "https://api.bihapi.pl/wfs/warszawa/veturilo?circle=");
             startActivity(intent);
 
         } else if (id == R.id.nav_parking) {
