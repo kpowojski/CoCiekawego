@@ -55,24 +55,6 @@ public class MainActivity extends AppCompatActivity
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        final Context context = this;
-        final CallApi callApi = new CallApi(context);
-        callApi.delegate = this;
-
-        button = (Button) findViewById(R.id.my_button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-
-                    callApi.execute();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-
         SharedPreferences settings = getSharedPreferences("UserPreferences", 0);
         String tmp = settings.getString("Rozrywka", null);
         if (tmp == null){
@@ -145,15 +127,15 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_public_transport) {
-            Intent intent = new Intent(this, MapsActivity.class);
-            intent.putExtra("url", "https://api.bihapi.pl/wfs/warszawa/veturilo?circle=");
-            startActivity(intent);
 
         } else if (id == R.id.nav_parking) {
 
         } else if (id == R.id.nav_sport_facilities) {
 
         } else if (id == R.id.nav_veturilo) {
+            Intent intent = new Intent(this, MapsActivity.class);
+            intent.putExtra("url", "https://api.bihapi.pl/wfs/warszawa/veturilo?circle=");
+            startActivityForResult(intent,1);
 
         } else if (id == R.id.nav_entertainment) {
 

@@ -15,4 +15,5 @@
     <string name="entertainment">Rozrywka</string>
     <string name="preferences">Preferencje</string>
     <string name="account">Moje konto</string>
+    <string name="download_data">Pobierz dane dla tego obszaru</string>
 </resources>

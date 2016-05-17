@@ -13,8 +13,10 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -24,6 +26,7 @@ import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -43,16 +46,22 @@ import pl.eiti.cociekawego.utils.CustomInfoWindowAdapter;
 /**
  * Created by krystian on 2016-05-04.
  */
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, AsyncResponse, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
+                                                        AsyncResponse,
+                                                        GoogleApiClient.ConnectionCallbacks,
+                                                        GoogleApiClient.OnConnectionFailedListener,
+                                                        GoogleMap.OnCameraChangeListener{
 
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
+    private Button mButton;
 
     private String url;
     private String[] geoLocation = new String[]{null, null}; //geoLocation[0] is  latitude
                                                             //geoLocation[1] is longitude
 
-    private CallApi callApi;
+    //central camera positions, use to enable camera moves xD
+    private boolean cameraPositioned;
 
 
     @Override
@@ -61,10 +70,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
         getDataFromIntent();
 
+
         mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        this.cameraPositioned = false;
     }
 
 
@@ -84,12 +96,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.mMap = googleMap;
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == 0 && ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == 0) {
+            this.mMap.setMyLocationEnabled(true);
+            this.mMap.getUiSettings().setMyLocationButtonEnabled(true);
+            this.mMap.getUiSettings().setZoomControlsEnabled(true);
+            this.mMap.setOnCameraChangeListener(this);
+        }
 
     }
 
 
     public JSONObject processFinish(JSONObject result){
-        this.mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(geoLocation[0]), Double.parseDouble(geoLocation[1])), 14.0f));
+        if (result == null){
+            Toast.makeText(this, "Nie można połaczyć się z serwerem. Proszę sprobować ponownie później.", Toast.LENGTH_SHORT).show();
+            finishActivity(0);
+        }
+        Log.d("CoCiekawego mapsActivity", "GeoLocation: " + geoLocation[0] + " " + geoLocation[1]);
+        this.mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(this.geoLocation[0]), Double.parseDouble(this.geoLocation[1])), 14.0f));
         mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(this));
         ArrayList<String[]> jsonData = new ArrayList<>();
 
@@ -127,6 +150,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void addMapMarkers(ArrayList<String[]> jsonData) {
 
+        this.mMap.clear();
         for (int i = 0; i<jsonData.size();i++){
             Double lat = Double.parseDouble(jsonData.get(i)[1]);
             Double lon = Double.parseDouble(jsonData.get(i)[2]);
@@ -138,7 +162,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .title(stationName)
                     .snippet(snippet));
         }
-
+        this.cameraPositioned = true;
     }
 
     @Override
@@ -150,7 +174,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 this.geoLocation[0] = String.valueOf(mLastLocation.getLatitude());
                 this.geoLocation[1] = String.valueOf(mLastLocation.getLongitude());
                 Log.d("CoCiekawego MapsActivity", "Location: " + geoLocation[0] + geoLocation[1]);
-                callApi = new CallApi(this);
+                CallApi callApi = new CallApi(this);
                 callApi.delegate = this;
                 callApi.execute(url, geoLocation[1], geoLocation[0], "1000");
 
@@ -180,4 +204,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Intent intent = getIntent();
         this.url = intent.getStringExtra("url");
     }
+
+    @Override
+    public void onCameraChange (CameraPosition position){
+        if (this.cameraPositioned)
+        {
+            LatLng tempPosition = this.mMap.getCameraPosition().target;
+            double tempLatitude = tempPosition.latitude;
+            double tempLongitude = tempPosition.longitude;
+            if (Math.abs(Double.parseDouble(this.geoLocation[0]) - tempLatitude) > 0.005 && Math.abs(Double.parseDouble(this.geoLocation[1]) - tempLongitude) > 0.005  ){
+                Log.d("CoCiekawego MapsActivity", "Mapa zmieniła znacząco pozycję");
+                this.geoLocation[0] = String.valueOf(tempLatitude);
+                this.geoLocation[1] = String.valueOf(tempLongitude);
+                CallApi callApi = new CallApi(this);
+                callApi.delegate = this;
+                callApi.execute(url, geoLocation[1], geoLocation[0], "1000");
+            }
+        }else{
+            Log.d("CoCiekawego MapsActivity", "Camera not positioned correctly");
+        }
+
+    }
+
+
 }
