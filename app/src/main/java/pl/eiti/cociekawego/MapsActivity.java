@@ -1,34 +1,23 @@
 package pl.eiti.cociekawego;
 
-import android.Manifest;
-import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
@@ -37,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import pl.eiti.cociekawego.callers.AsyncResponse;
 import pl.eiti.cociekawego.callers.CallApi;
@@ -52,10 +42,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                         GoogleApiClient.OnConnectionFailedListener,
                                                         GoogleMap.OnCameraChangeListener{
 
+
+    private static float[] mapMarkersColors = new float[]{BitmapDescriptorFactory.HUE_AZURE,
+            BitmapDescriptorFactory.HUE_BLUE,
+            BitmapDescriptorFactory.HUE_CYAN,
+            BitmapDescriptorFactory.HUE_GREEN,
+            BitmapDescriptorFactory.HUE_MAGENTA,
+            BitmapDescriptorFactory.HUE_ORANGE,
+            BitmapDescriptorFactory.HUE_RED,
+            BitmapDescriptorFactory.HUE_ROSE,
+            BitmapDescriptorFactory.HUE_VIOLET,
+            BitmapDescriptorFactory.HUE_YELLOW};
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
-    private Button mButton;
-
+    private String atraction;
     private String url;
     private String[] geoLocation = new String[]{null, null}; //geoLocation[0] is  latitude
                                                             //geoLocation[1] is longitude
@@ -106,18 +106,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    public JSONObject processFinish(JSONObject result){
+    public void processFinish(JSONObject result){
         if (result == null){
             Toast.makeText(this, "Nie można połaczyć się z serwerem. Proszę sprobować ponownie później.", Toast.LENGTH_SHORT).show();
             finishActivity(0);
         }
-        Log.d("CoCiekawego mapsActivity", "GeoLocation: " + geoLocation[0] + " " + geoLocation[1]);
+
         this.mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(this.geoLocation[0]), Double.parseDouble(this.geoLocation[1])), 14.0f));
         mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(this));
-        ArrayList<String[]> jsonData = new ArrayList<>();
 
+
+        switch(this.atraction){
+            case Constants.veturilo:
+                parseVeturiloData(result);
+                break;
+            case Constants.parkAndRide:
+                parseParkAndRideData(result);
+                break;
+            default:
+                Toast.makeText(this, "Nie można połaczyć się z serwerem. Proszę sprobować ponownie później.", Toast.LENGTH_LONG).show();
+                finishActivity(1);
+        }
+
+
+
+    }
+
+    private void parseVeturiloData(JSONObject result) {
+        ArrayList<String[]> jsonData = new ArrayList<>();
         try {
-            JSONArray data = result.getJSONArray(Constants.veturiloData);
+
+            JSONArray data = result.getJSONArray(Constants.data);
             Log.d("CoCiekawego MapsActivity", "dlugość tablicy: " + data.length());
             for (int i = 0; i<data.length(); i++){
                 JSONObject object = data.getJSONObject(i);
@@ -143,12 +162,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        addMapMarkersForVeturilo(jsonData);
 
-        addMapMarkers(jsonData);
-        return result;
+
     }
 
-    private void addMapMarkers(ArrayList<String[]> jsonData) {
+
+    private void parseParkAndRideData(JSONObject result){
+        ArrayList<String[]> jsonData = new ArrayList<>();
+        try{
+            JSONArray data = result.getJSONArray(Constants.data);
+            Log.d("CoCiekawego MapsActivity", "dlugość tablicy: " + data.length());
+//            for (int i = 0; i<data.length(); i++){
+
+        }catch(JSONException e){
+
+        }
+    }
+
+    private void addMapMarkersForVeturilo(ArrayList<String[]> jsonData) {
 
         this.mMap.clear();
         for (int i = 0; i<jsonData.size();i++){
@@ -160,7 +192,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(lat,lon))
                     .title(stationName)
-                    .snippet(snippet));
+                    .snippet(snippet)
+                    .icon(BitmapDescriptorFactory.defaultMarker(mapMarkersColors[new Random().nextInt(mapMarkersColors.length)])));
         }
         this.cameraPositioned = true;
     }
@@ -203,6 +236,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void getDataFromIntent() {
         Intent intent = getIntent();
         this.url = intent.getStringExtra("url");
+        this.atraction = intent.getStringExtra("atraction");
     }
 
     @Override
@@ -212,7 +246,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             LatLng tempPosition = this.mMap.getCameraPosition().target;
             double tempLatitude = tempPosition.latitude;
             double tempLongitude = tempPosition.longitude;
-            if (Math.abs(Double.parseDouble(this.geoLocation[0]) - tempLatitude) > 0.005 && Math.abs(Double.parseDouble(this.geoLocation[1]) - tempLongitude) > 0.005  ){
+            if (Math.abs(Double.parseDouble(this.geoLocation[0]) - tempLatitude) > 0.009 || Math.abs(Double.parseDouble(this.geoLocation[1]) - tempLongitude) > 0.009  ){
                 Log.d("CoCiekawego MapsActivity", "Mapa zmieniła znacząco pozycję");
                 this.geoLocation[0] = String.valueOf(tempLatitude);
                 this.geoLocation[1] = String.valueOf(tempLongitude);

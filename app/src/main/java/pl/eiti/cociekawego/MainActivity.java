@@ -24,10 +24,11 @@ import java.util.concurrent.ExecutionException;
 
 import pl.eiti.cociekawego.callers.AsyncResponse;
 import pl.eiti.cociekawego.callers.CallApi;
+import pl.eiti.cociekawego.utils.Constants;
 import pl.eiti.cociekawego.utils.Helper;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AsyncResponse {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
 
     TextView text;
@@ -129,12 +130,17 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_public_transport) {
 
         } else if (id == R.id.nav_parking) {
+            Intent intent = new Intent(this, MapsActivity.class);
+            intent.putExtra(Constants.url, "https://api.bihapi.pl/wfs/warszawa/parkAndRide?circle=");
+            intent.putExtra(Constants.atraction, Constants.parkAndRide);
+            startActivityForResult(intent,1);
 
         } else if (id == R.id.nav_sport_facilities) {
 
         } else if (id == R.id.nav_veturilo) {
             Intent intent = new Intent(this, MapsActivity.class);
-            intent.putExtra("url", "https://api.bihapi.pl/wfs/warszawa/veturilo?circle=");
+            intent.putExtra(Constants.url, "https://api.bihapi.pl/wfs/warszawa/veturilo?circle=");
+            intent.putExtra(Constants.atraction, Constants.veturilo);
             startActivityForResult(intent,1);
 
         } else if (id == R.id.nav_entertainment) {
@@ -158,8 +164,5 @@ public class MainActivity extends AppCompatActivity
         navDrawerElements.put("Rozrywka", R.id.nav_entertainment);
     }
 
-    public JSONObject processFinish(JSONObject result){
 
-        return result;
-    }
 }
