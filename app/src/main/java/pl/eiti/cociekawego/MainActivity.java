@@ -1,9 +1,11 @@
 package pl.eiti.cociekawego;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -56,15 +58,20 @@ public class MainActivity extends AppCompatActivity
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        SharedPreferences settings = getSharedPreferences("UserPreferences", 0);
-        String tmp = settings.getString("Rozrywka", null);
-        if (tmp == null){
-            //application has never been run, so SharedPreferences are empty
-            //in any other situation user preferences will be avaliable
 
-        }else{
-            Log.i("CoCiekawego MainActivity", "Other run");
-        }
+        //it shoudl be implemented in this app;
+        //http://stackoverflow.com/questions/31235564/locationsettingsrequest-dialog-onactivityresult-skipped
+
+
+//        SharedPreferences settings = getSharedPreferences("UserPreferences", 0);
+//        String tmp = settings.getString("Rozrywka", null);
+//        if (tmp == null){
+//            //application has never been run, so SharedPreferences are empty
+//            //in any other situation user preferences will be avaliable
+//
+//        }else{
+//            Log.i("CoCiekawego MainActivity", "Other run");
+//        }
 
     }
 
@@ -133,19 +140,38 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, MapsActivity.class);
             intent.putExtra(Constants.url, "https://api.bihapi.pl/wfs/warszawa/parkAndRide?circle=");
             intent.putExtra(Constants.atraction, Constants.parkAndRide);
-            startActivityForResult(intent,1);
+            startActivity(intent);
 
-        } else if (id == R.id.nav_sport_facilities) {
+        } else if (id == R.id.nav_pitch) {
+            Intent intent = new Intent(this, MapsActivity.class);
+            intent.putExtra(Constants.url, "https://api.bihapi.pl/wfs/warszawa/sportFields?circle=");
+            intent.putExtra(Constants.atraction, Constants.sportFacilities);
+            startActivity(intent);
+
 
         } else if (id == R.id.nav_veturilo) {
             Intent intent = new Intent(this, MapsActivity.class);
             intent.putExtra(Constants.url, "https://api.bihapi.pl/wfs/warszawa/veturilo?circle=");
             intent.putExtra(Constants.atraction, Constants.veturilo);
-            startActivityForResult(intent,1);
+            startActivity(intent);
 
-        } else if (id == R.id.nav_entertainment) {
+        } else if (id == R.id.nav_swimming_pools) {
+            Intent intent = new Intent(this, MapsActivity.class);
+            intent.putExtra(Constants.url, "https://api.bihapi.pl/wfs/warszawa/swimmingPools?circle=");
+            intent.putExtra(Constants.atraction, Constants.swimmingPools);
+            startActivity(intent);
 
-        } else if (id == R.id.nav_preferences){
+
+        } else if (id == R.id.nav_theatres){
+
+        } else if (id == R.id.nav_restaurants){
+            Intent intent = new Intent(this, MapsActivity.class);
+            intent.putExtra(Constants.url, "https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+            intent.putExtra(Constants.atraction, Constants.restaurant);
+            startActivity(intent);
+        }
+
+        else if (id == R.id.nav_preferences){
             Intent intent = new Intent(this, PreferenceActivity.class);
             startActivity(intent);
         }
@@ -157,12 +183,22 @@ public class MainActivity extends AppCompatActivity
 
     private void mapElements() {
         //it's not elegant but we are lazy students
+        // <item>Transport publiczny</item>
+//        <item>Parking P+R</item>
+//        <item>Boiska</item>
+//        <item>Stacje Veturilo</item>
+//        <item>Pływalnie</item>
+//        <item>Teatry</item>
         navDrawerElements.put("Transport publiczny", R.id.nav_public_transport);
         navDrawerElements.put("Parking P+R", R.id.nav_parking);
-        navDrawerElements.put("Obiekty sportowe", R.id.nav_sport_facilities);
+        navDrawerElements.put("Boiska", R.id.nav_pitch);
         navDrawerElements.put("Stacje Veturilo", R.id.nav_veturilo);
-        navDrawerElements.put("Rozrywka", R.id.nav_entertainment);
+        navDrawerElements.put("Pływalnie", R.id.nav_swimming_pools);
+        navDrawerElements.put("Teatry", R.id.nav_theatres);
+        navDrawerElements.put("Restauracje", R.id.nav_restaurants);
     }
+
+
 
 
 }

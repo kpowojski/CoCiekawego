@@ -13,7 +13,15 @@
     <string name="sport_facilities">Obiekty sportowe</string>
     <string name="veturilo">Stacje Veturilo</string>
     <string name="entertainment">Rozrywka</string>
+    <string name="swimming_pools">Pływalnie</string>
+    <string name="theatres">Teatry</string>
+    <string name="restaurant">Restauracje</string>
     <string name="preferences">Preferencje</string>
     <string name="account">Moje konto</string>
     <string name="download_data">Pobierz dane dla tego obszaru</string>
+
+
+
+
+    <string name="gps_net_not_avaliable">Lokalizacja nie jest włączona</string>
 </resources>

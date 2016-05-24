@@ -3,9 +3,11 @@
     <string-array name="preferencje">
         <item>Transport publiczny</item>
         <item>Parking P+R</item>
-        <item>Obiekty sportowe</item>
+        <item>Boiska</item>
         <item>Stacje Veturilo</item>
-        <item>Rozrywka</item>
+        <item>Pływalnie</item>
+        <item>Teatry</item>
+        <item>Restauracje</item>
     </string-array>
 
 

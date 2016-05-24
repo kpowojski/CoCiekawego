@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import pl.eiti.cociekawego.utils.Constants;
 import pl.eiti.cociekawego.utils.Helper;
 
 /**
@@ -35,7 +36,7 @@ public class PreferenceActivity extends Activity {
         setContentView(R.layout.activity_preference_list);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.preferences);
+        toolbar.setTitle(Constants.PREFERENCES);
 
         listView = (ListView) findViewById(R.id.preference_listview);
         values = Helper.getPreferencesArray(this);

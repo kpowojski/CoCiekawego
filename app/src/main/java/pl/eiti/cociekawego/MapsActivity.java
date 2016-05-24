@@ -106,10 +106,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    public void processFinish(JSONObject result){
+    public boolean processFinish(JSONObject result){
         if (result == null){
             Toast.makeText(this, "Nie można połaczyć się z serwerem. Proszę sprobować ponownie później.", Toast.LENGTH_SHORT).show();
-            finishActivity(0);
+            return false;
         }
 
         this.mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(this.geoLocation[0]), Double.parseDouble(this.geoLocation[1])), 14.0f));
@@ -123,14 +123,93 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case Constants.parkAndRide:
                 parseParkAndRideData(result);
                 break;
+            case Constants.sportFacilities:
+                parseSportFacilities(result);
+                break;
+            case Constants.swimmingPools:
+                parseSwimmingPools(result);
+                break;
+            case Constants.restaurant:
+                parseRestaurnat(result);
+                break;
             default:
                 Toast.makeText(this, "Nie można połaczyć się z serwerem. Proszę sprobować ponownie później.", Toast.LENGTH_LONG).show();
-                finishActivity(1);
+        }
+
+        return true;
+
+    }
+
+    private void parseRestaurnat(JSONObject data) {
+        //parse messge received from Google Places API
+
+        ArrayList<String[]> jsonData = new ArrayList<>();
+
+        try{
+            JSONArray results = data.getJSONArray(Constants.results);
+            for (int i=0; i<results.length();i++){
+                JSONObject singleResult = results.getJSONObject(i);
+
+                JSONObject geometryLocation = singleResult.getJSONObject("geometry").getJSONObject(Constants.location);
+                String lat = geometryLocation.getString(Constants.latitude);
+                String lon = geometryLocation.getString(Constants.longitude_v2);
+
+                String name = singleResult.getString("name");
+                String street = singleResult.getString("vicinity");
+
+
+
+                String[] tab = new String[] {lat, lon, name, street};
+                jsonData.add(tab);
+            }
+
+        }catch (JSONException e){
+            e.printStackTrace();
+            wrongDataDownloaded();
+        }catch (Exception e){
+            communicationProblem();
+        }
+
+        addMapMarkersForRestaurant(jsonData);
+
+    }
+
+
+
+    private void parseSportFacilities(JSONObject result) {
+        ArrayList<String[]> jsonData = new ArrayList<>();
+
+        try{
+            JSONArray data = result.getJSONArray(Constants.data);
+            for (int i=0; i<data.length();i++){
+                JSONObject singleObject = data.getJSONObject(i);
+
+                JSONObject geometry = singleObject.getJSONObject(Constants.geometry);
+                JSONArray properties = singleObject.getJSONArray(Constants.properties);
+
+                JSONObject coordinates = geometry.getJSONObject(Constants.coordinates);
+                String lat = coordinates.getString(Constants.latitude);
+                String lon = coordinates.getString(Constants.longitude);
+
+                String address = properties.getJSONObject(0).getString(Constants.value);
+                String addressNr = properties.getJSONObject(1).getString(Constants.value);
+                String description = properties.getJSONObject(2).getString(Constants.value);
+                String telephone = properties.getJSONObject(5).getString(Constants.value);
+                String[] facilitiesData = new String[]{lat,lon, address+" "+addressNr, description, telephone};
+                jsonData.add(facilitiesData);
+            }
+
+        }catch(JSONException e){
+            wrongDataDownloaded();
+        }catch(Exception e){
+            communicationProblem();
         }
 
 
+        addMapMarkersForSportFacilities(jsonData);
 
     }
+
 
     private void parseVeturiloData(JSONObject result) {
         ArrayList<String[]> jsonData = new ArrayList<>();
@@ -141,14 +220,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             for (int i = 0; i<data.length(); i++){
                 JSONObject object = data.getJSONObject(i);
 
-                JSONObject geometry = object.getJSONObject(Constants.veturiloGeometry);
-                JSONArray properties = object.getJSONArray(Constants.veturiloProperties);
+                JSONObject geometry = object.getJSONObject(Constants.geometry);
+                JSONArray properties = object.getJSONArray(Constants.properties);
 
 
 
-                JSONObject coordinates = geometry.getJSONObject(Constants.veturiloCoordinates);
-                String lat = coordinates.getString(Constants.veturiloLatitude);
-                String lon = coordinates.getString(Constants.veturiloLongitude);
+                JSONObject coordinates = geometry.getJSONObject(Constants.coordinates);
+                String lat = coordinates.getString(Constants.latitude);
+                String lon = coordinates.getString(Constants.longitude);
 
                 String nrStacji = properties.getJSONObject(2).getString(Constants.value);  //get JSONObject which contains  station name
                 String bikesLeft = properties.getJSONObject(3).getString(Constants.value); //get information how many bikes are avaliable in that station
@@ -161,6 +240,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         } catch (JSONException e) {
             e.printStackTrace();
+            wrongDataDownloaded();
+        } catch (Exception e){
+            communicationProblem();
         }
         addMapMarkersForVeturilo(jsonData);
 
@@ -170,14 +252,112 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void parseParkAndRideData(JSONObject result){
         ArrayList<String[]> jsonData = new ArrayList<>();
-        try{
+        try {
+
             JSONArray data = result.getJSONArray(Constants.data);
             Log.d("CoCiekawego MapsActivity", "dlugość tablicy: " + data.length());
-//            for (int i = 0; i<data.length(); i++){
+            for (int i = 0; i<data.length(); i++){
+                JSONObject object = data.getJSONObject(i);
 
-        }catch(JSONException e){
+                JSONObject geometry = object.getJSONObject(Constants.geometry);
+                JSONArray properties = object.getJSONArray(Constants.properties);
 
+
+
+                JSONObject coordinates = geometry.getJSONObject(Constants.coordinates);
+                String lat = coordinates.getString(Constants.latitude);
+                String lon = coordinates.getString(Constants.longitude);
+
+                String name = properties.getJSONObject(4).getString(Constants.value);  //get JSONObject which contains  parking name
+                String description = properties.getJSONObject(1).getString(Constants.value); //get description
+
+                String[] stationData = new String[]{lat, lon, name, description};
+                jsonData.add(stationData);
+
+
+            }
+        } catch (JSONException e) {
+            wrongDataDownloaded();
+        } catch (Exception e){
+            communicationProblem();
         }
+
+        addMapMarkersForParkAndRide(jsonData);
+    }
+
+
+    private void parseSwimmingPools(JSONObject result){
+        ArrayList<String[]> jsonData = new ArrayList<>();
+        try {
+
+            JSONArray data = result.getJSONArray(Constants.data);
+            for (int i = 0; i<data.length(); i++){
+                JSONObject object = data.getJSONObject(i);
+
+                JSONObject geometry = object.getJSONObject(Constants.geometry);
+                JSONArray properties = object.getJSONArray(Constants.properties);
+
+
+
+                JSONObject coordinates = geometry.getJSONObject(Constants.coordinates);
+                String lat = coordinates.getString(Constants.latitude);
+                String lon = coordinates.getString(Constants.longitude);
+
+                String street = properties.getJSONObject(0).getString(Constants.value);  //get street name
+                String buildingNr = properties.getJSONObject(1).getString(Constants.value); //get building number; this lines conncateneted will be used to generate facilities address
+                String description = properties.getJSONObject(2).getString(Constants.value); //get attraction description
+                String telephone = properties.getJSONObject(3).getString(Constants.value);
+                String webPage = properties.getJSONObject(4).getString(Constants.value);
+                String[] stationData = new String[]{lat, lon, street+" "+buildingNr, description, telephone, webPage};
+                jsonData.add(stationData);
+
+
+            }
+        } catch (JSONException e) {
+            wrongDataDownloaded();
+        } catch (Exception e){
+            communicationProblem();
+        }
+
+        addMapMarkersForSwimmingPools(jsonData);
+    }
+
+    private void addMapMarkersForSwimmingPools(ArrayList<String[]> jsonData) {
+        this.mMap.clear();
+
+        //lat, lon, street buildingNr, description, telephone, webPage
+        for (int i = 0; i<jsonData.size();i++){
+            Double lat = Double.parseDouble(jsonData.get(i)[0]);
+            Double lon = Double.parseDouble(jsonData.get(i)[1]);
+            String stationName = new String (Constants.name  + jsonData.get(i)[2]);
+            String snippet  = new String (Constants.description + jsonData.get(i)[3]);
+
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(lat,lon))
+                    .title(stationName)
+                    .snippet(snippet)
+                    .icon(BitmapDescriptorFactory.defaultMarker(mapMarkersColors[new Random().nextInt(mapMarkersColors.length)])));
+        }
+        this.cameraPositioned = true;
+    }
+
+    private void addMapMarkersForParkAndRide(ArrayList<String[]> jsonData) {
+        this.mMap.clear();
+
+        //lat, lon, name, description
+        for (int i = 0; i<jsonData.size();i++){
+            Double lat = Double.parseDouble(jsonData.get(i)[0]);
+            Double lon = Double.parseDouble(jsonData.get(i)[1]);
+            String stationName = new String (Constants.name  + jsonData.get(i)[2]);
+            String snippet  = new String (Constants.description + jsonData.get(i)[3]);
+
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(lat,lon))
+                    .title(stationName)
+                    .snippet(snippet)
+                    .icon(BitmapDescriptorFactory.defaultMarker(mapMarkersColors[new Random().nextInt(mapMarkersColors.length)])));
+        }
+        this.cameraPositioned = true;
     }
 
     private void addMapMarkersForVeturilo(ArrayList<String[]> jsonData) {
@@ -198,6 +378,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         this.cameraPositioned = true;
     }
 
+    private void addMapMarkersForSportFacilities(ArrayList<String[]> jsonData) {
+        this.mMap.clear();
+        //jsonData[i] = lat,lon, address+" "+addressNr, description, telephone
+        for (int i =0; i<jsonData.size();i++){
+            Double lat = Double.parseDouble(jsonData.get(i)[0]);
+            Double lon = Double.parseDouble(jsonData.get(i)[1]);
+
+            String name = jsonData.get(i)[2];
+            String snippet = new String(Constants.sportFacilitiesDescription + jsonData.get(i)[3]+ "\r\n" + Constants.telephone + jsonData.get(i)[4]);
+
+            this.mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(lat, lon))
+                        .title(name)
+                        .snippet(snippet)
+                        .icon(BitmapDescriptorFactory.defaultMarker(mapMarkersColors[new Random().nextInt(mapMarkersColors.length)])));
+        }
+        this.cameraPositioned = true;
+    }
+
+    private void addMapMarkersForRestaurant(ArrayList<String[]> jsonData) {
+        this.mMap.clear();
+        //jsonData[i] = lat, lon, name, street, rating
+        for (int i =0; i<jsonData.size();i++){
+            Double lat = Double.parseDouble(jsonData.get(i)[0]);
+            Double lon = Double.parseDouble(jsonData.get(i)[1]);
+
+            String name = jsonData.get(i)[2];
+            String snippet = "Adres " + jsonData.get(i)[3] + "\r\n";
+
+            this.mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(lat, lon))
+                    .title(name)
+                    .snippet(snippet)
+                   .icon(BitmapDescriptorFactory.defaultMarker(mapMarkersColors[new Random().nextInt(mapMarkersColors.length)])));
+        }
+        this.cameraPositioned = true;
+    }
+
+
+
+
     @Override
     public void onConnected(Bundle bundle) {
 
@@ -209,7 +430,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.d("CoCiekawego MapsActivity", "Location: " + geoLocation[0] + geoLocation[1]);
                 CallApi callApi = new CallApi(this);
                 callApi.delegate = this;
-                callApi.execute(url, geoLocation[1], geoLocation[0], "1000");
+                if (this.atraction.equals(Constants.restaurant)){
+                    String url = prepareGooglePlacesURL();
+                    callApi.execute(url);
+                }else{
+                    callApi.execute(url, geoLocation[1], geoLocation[0], "1000");
+                }
+
 
             }else{
                 Log.d("CoCiekawego MapsActivity", "mLastLocation null");
@@ -217,6 +444,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }else{
             Log.d("CoCiekawego MapsActivity", "permissionProblems xD ");
         }
+
+    }
+
+    private String prepareGooglePlacesURL() {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(this.url);
+        builder.append(Constants.location+"=");
+        builder.append(this.geoLocation[0]+","+this.geoLocation[1]+"&");
+        builder.append("radius=500&type=restaurant&key=AIzaSyBj044oG-Pc4ZlSgKUbyv-JwFQAKLPiSXc");
+
+
+        return builder.toString();
 
     }
 
@@ -246,13 +486,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             LatLng tempPosition = this.mMap.getCameraPosition().target;
             double tempLatitude = tempPosition.latitude;
             double tempLongitude = tempPosition.longitude;
-            if (Math.abs(Double.parseDouble(this.geoLocation[0]) - tempLatitude) > 0.009 || Math.abs(Double.parseDouble(this.geoLocation[1]) - tempLongitude) > 0.009  ){
+            if (Math.abs(Double.parseDouble(this.geoLocation[0]) - tempLatitude) > 0.015 || Math.abs(Double.parseDouble(this.geoLocation[1]) - tempLongitude) > 0.015  ){
                 Log.d("CoCiekawego MapsActivity", "Mapa zmieniła znacząco pozycję");
                 this.geoLocation[0] = String.valueOf(tempLatitude);
                 this.geoLocation[1] = String.valueOf(tempLongitude);
                 CallApi callApi = new CallApi(this);
                 callApi.delegate = this;
-                callApi.execute(url, geoLocation[1], geoLocation[0], "1000");
+                if (this.atraction.equals(Constants.restaurant)) {
+                    String url = prepareGooglePlacesURL();
+                    callApi.execute(url);
+                }else {
+
+                    callApi.execute(url, geoLocation[1], geoLocation[0], "1000");
+                }
             }
         }else{
             Log.d("CoCiekawego MapsActivity", "Camera not positioned correctly");
@@ -261,4 +507,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+    public void wrongDataDownloaded(){
+        Toast.makeText(this, "Pobrano błędne dane. Prosze spróbować raz jeszcze.", Toast.LENGTH_LONG).show();
+    }
+
+
+    public void communicationProblem(){
+        //this toast is displayed when something went wrong in communication with API
+        Toast.makeText(this, "Problem z komunikacją z API. Proszę sprobować ponownie!", Toast.LENGTH_LONG).show();
+    }
 }

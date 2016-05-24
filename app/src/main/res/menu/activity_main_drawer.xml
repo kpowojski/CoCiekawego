@@ -11,17 +11,30 @@
             android:icon="@drawable/ic_menu_parking"
             android:title="@string/parking" />
         <item
-            android:id="@+id/nav_sport_facilities"
+            android:id="@+id/nav_pitch"
             android:icon="@drawable/ic_menu_sport_facilities"
             android:title="@string/sport_facilities" />
         <item
             android:id="@+id/nav_veturilo"
             android:icon="@drawable/ic_menu_veturilo"
             android:title="@string/veturilo" />
+
         <item
-            android:id="@+id/nav_entertainment"
-            android:icon="@drawable/ic_menu_entertainment"
-            android:title="@string/entertainment" />
+            android:id="@+id/nav_swimming_pools"
+            android:icon="@drawable/ic_menu_swimming_pool"
+            android:title="@string/swimming_pools"/>
+
+        <item
+            android:id="@+id/nav_theatres"
+            android:icon="@drawable/ic_nav_theatres"
+            android:title="@string/theatres"/>
+
+        <item
+            android:id="@+id/nav_restaurants"
+            android:icon="@drawable/ic_nav_restaurant"
+            android:title="@string/restaurant"/>
+
+
     </group>
 
     <item android:title="@string/account">
