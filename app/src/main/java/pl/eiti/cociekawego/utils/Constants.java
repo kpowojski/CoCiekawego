@@ -9,10 +9,10 @@ public class Constants {
     public final static String PREFERENCES = "Preferencje";
 
     //preferences list
-    public final static String parkAndRide= "parkAndRide";
-    public final static String veturilo = "veturilo";
-    public final static String sportFacilities = "sportFacilities";
-    public final static String swimmingPools = "swimmingPools";
+    public final static String parkAndRide= "Parking P+R";
+    public final static String veturilo = "Stacje Veturilo";
+    public final static String sportFacilities = "Obiekty sportowe";
+    public final static String swimmingPools = "Pływalnie";
 
 
     public final static String url = "url";
@@ -44,8 +44,11 @@ public class Constants {
     public final static String description = "Opis";
 
 
-    public final static String restaurant= "restaurant";
+    public final static String restaurant= "Restaurcaje";
     public final static String results = "results";
     public final static String location = "location";
     public final static String longitude_v2 = "lng";
+
+    public final static String title = "title";
+    public final static String snippet = "snippet";
 }

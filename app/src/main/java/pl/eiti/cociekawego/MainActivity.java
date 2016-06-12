@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
 
-    TextView text;
+
     Toolbar toolbar;
     NavigationView navigationView;
     HashMap<String, Object> navDrawerElements;
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity
         navDrawerElements = new HashMap<>();
         mapElements();
 
-        text = (TextView) findViewById(R.id.my_text);
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -59,8 +59,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        //it shoudl be implemented in this app;
-        //http://stackoverflow.com/questions/31235564/locationsettingsrequest-dialog-onactivityresult-skipped
+
 
 
 //        SharedPreferences settings = getSharedPreferences("UserPreferences", 0);
@@ -92,7 +91,7 @@ public class MainActivity extends AppCompatActivity
             }
             builder.append(pref[i] + " : " + value + "\r\n");
         }
-        text.setText(builder.toString());
+
     }
 
 

@@ -19,7 +19,15 @@
     <string name="preferences">Preferencje</string>
     <string name="account">Moje konto</string>
     <string name="download_data">Pobierz dane dla tego obszaru</string>
+    <string name="begining_text">Aplikacja CoCiekawego zrealizowana jako projekt zaliczeniowy z przedmiotu UTE.
+    Pozwala znaleźć ciekawe miejsca w pobliżu użytkownika oraz podzielić się swoimi zainteresowaniami ze znajomymi.
 
+    Skład zespołu projektowego:
+        Krystian Powójski
+        Ewelina Żochowska
+
+    Semestr: 16L
+    </string>
 
 
 

@@ -12,10 +12,49 @@
     tools:context="pl.eiti.cociekawego.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
+    <LinearLayout
+        android:id="@+id/logos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp">
+
+    </LinearLayout>
+
+
+
+
     <TextView
         android:id="@+id/my_text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="@string/begining_text"
+        android:layout_below="@+id/imageView2"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="51dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/pw_logo"
+        android:layout_gravity="left"
+        android:layout_above="@+id/my_text"
+        android:layout_toLeftOf="@+id/imageView2"
+        android:layout_toStartOf="@+id/imageView2"
+        android:layout_marginRight="25dp"
+        android:layout_marginEnd="25dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/elka_logo"
+        android:layout_gravity="right"
+        android:id="@+id/imageView2"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/my_text"
+        android:layout_alignEnd="@+id/my_text"
+        android:layout_marginRight="24dp"
+        android:layout_marginEnd="24dp" />
 
 
 </RelativeLayout>

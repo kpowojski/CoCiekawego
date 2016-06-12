@@ -1,5 +1,6 @@
 package pl.eiti.cociekawego;
 
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -18,6 +20,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
@@ -32,6 +35,7 @@ import pl.eiti.cociekawego.callers.AsyncResponse;
 import pl.eiti.cociekawego.callers.CallApi;
 import pl.eiti.cociekawego.utils.Constants;
 import pl.eiti.cociekawego.utils.CustomInfoWindowAdapter;
+import pl.eiti.cociekawego.utils.FacilitiesDetails;
 
 /**
  * Created by krystian on 2016-05-04.
@@ -70,7 +74,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
         getDataFromIntent();
 
-
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(this.atraction);
         mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -113,7 +118,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         this.mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(this.geoLocation[0]), Double.parseDouble(this.geoLocation[1])), 14.0f));
-        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(this));
+        //mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(this));
+        final Context con  = this;
+        this.mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener()
+        {
+            @Override
+            public boolean onMarkerClick(Marker arg){
+                if (arg != null){
+                    Intent intent = new Intent(con, FacilitiesDetails.class);
+                    String title = arg.getTitle();
+                    intent.putExtra(Constants.title, title);
+
+                    double lat = arg.getPosition().latitude;
+                    double lon = arg.getPosition().longitude;
+                    intent.putExtra(Constants.latitude, Double.toString(lat));
+                    intent.putExtra(Constants.longitude, Double.toString(lon));
+
+                    String snippet = arg.getSnippet();
+                    intent.putExtra(Constants.snippet, snippet);
+
+                    startActivity(intent);
+                    return true;
+                }
+                return false;
+            }
+        });
 
 
         switch(this.atraction){
